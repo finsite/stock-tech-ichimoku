@@ -1,3 +1,4 @@
+---
 name: Build and Push Docker Image to GitHub Container Registry
 
 on:

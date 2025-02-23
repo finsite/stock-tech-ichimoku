@@ -1,3 +1,4 @@
+---
 name: Documentation Build
 
 on: [push, pull_request]
