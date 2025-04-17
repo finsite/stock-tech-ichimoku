@@ -1,5 +1,5 @@
 ## Changelog
 
-- fixing formatting on the files (Mark Quinn)
-- renamed labeler to fix github actions (Mark Quinn)
+- Merge branch 'main' of https://github.com/finsite/stock-tech-ichimoku (Mark Quinn)
+- adding test files (Mark Quinn)
 - bump: patch version + changelog [skip ci] (github-actions[bot])
