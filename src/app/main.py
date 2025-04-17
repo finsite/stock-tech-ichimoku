@@ -23,14 +23,18 @@ logger = setup_logger(__name__)
 
 
 def main() -> None:
-    """Main entry point of the application.
+    """Main entry point of the Ichimoku Cloud Analysis Service.
 
-    This function starts the Ichimoku analysis service by consuming messages
-    from the configured message queue and processing them for technical insights.
+    This function starts the service by consuming messages from the configured
+    message queue and processing them for technical insights.
+
+    The service will process messages from either RabbitMQ or SQS queues,
+    depending on the configuration. The processed messages will be logged
+    to the console in JSON format.
 
     Returns
     -------
-        None
+    None: No return value.
 
     """
     logger.info("Starting Ichimoku Cloud Analysis Service...")

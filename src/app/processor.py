@@ -1,4 +1,10 @@
 """Module to process stock data using Ichimoku Cloud analysis.
+
+The Ichimoku Cloud is a set of technical indicators used to gauge momentum,
+as well as to identify trend direction and potential buy/sell signals.
+
+This module provides the `compute_ichimoku_cloud` function to compute the
+Ichimoku Cloud indicators for a given DataFrame of stock data.
 """
 
 import pandas as pd

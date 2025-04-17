@@ -39,10 +39,24 @@ if QUEUE_TYPE == "sqs":
 
 
 def connect_to_rabbitmq() -> pika.BlockingConnection:
-    retries = 5
+    """Establishes a connection to RabbitMQ. This function will retry up to 5 times
+    if the connection fails, waiting 5 seconds between each attempt.
+
+    Returns
+    -------
+        pika.BlockingConnection: The established RabbitMQ connection.
+
+    Raises
+    ------
+        ConnectionError: If the connection cannot be established after retries.
+
+    """
+    retries: int = 5
     while retries > 0:
         try:
-            conn = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST))
+            conn: pika.BlockingConnection = pika.BlockingConnection(
+                pika.ConnectionParameters(host=RABBITMQ_HOST)
+            )
             if conn.is_open:
                 logger.info("Connected to RabbitMQ")
                 return conn
@@ -50,26 +64,68 @@ def connect_to_rabbitmq() -> pika.BlockingConnection:
             retries -= 1
             logger.warning("RabbitMQ connection failed: %s. Retrying in 5s...", e)
             time.sleep(5)
-    raise ConnectionError("Could not connect to RabbitMQ after retries")
+    raise ConnectionError("Could not connect to RabbitMQ after {} retries".format(retries))
 
 
 def consume_rabbitmq() -> None:
-    connection = connect_to_rabbitmq()
-    channel = connection.channel()
+    """Consumes messages from RabbitMQ and applies Ichimoku Cloud analysis.
 
+    The messages are expected to be in JSON format with the following structure:
+    {
+        "symbol": str,
+        "timestamp": int,
+        "source": str,
+        "data": list[dict[str, any]]
+    }
+
+    The `data` field is a list of dictionaries containing the stock data.
+    Each dictionary should contain the keys "date", "open", "high", "low", "close".
+
+    Returns
+    -------
+        None
+
+    """
+    connection: pika.BlockingConnection = connect_to_rabbitmq()
+    channel: pika.adapters.blocking_connection.BlockingChannel = connection.channel()
+
+    # Declare the exchange and queue
     channel.exchange_declare(exchange=RABBITMQ_EXCHANGE, exchange_type="topic", durable=True)
     channel.queue_declare(queue=RABBITMQ_QUEUE, durable=True)
+
+    # Bind the queue to the exchange
     channel.queue_bind(
         exchange=RABBITMQ_EXCHANGE, queue=RABBITMQ_QUEUE, routing_key=RABBITMQ_ROUTING_KEY
     )
 
-    def callback(ch, method, properties, body: bytes) -> None:
+    def callback(
+        ch: pika.adapters.blocking_connection.BlockingChannel,
+        method: pika.spec.Basic.Deliver,
+        properties: pika.spec.BasicProperties,
+        body: bytes,
+    ) -> None:
+        """Callback function for the RabbitMQ consumer.
+
+        This function is called when a message is received from RabbitMQ.
+
+        Args:
+        ----
+            ch: The channel object.
+            method: Delivery details.
+            properties: Message properties.
+            body: The message body as bytes.
+
+        Returns:
+        -------
+            None
+
+        """
         try:
-            message = json.loads(body)
+            message: dict = json.loads(body)
             logger.info("Received message: %s", message)
 
-            df = compute_ichimoku_cloud(pd.DataFrame(message["data"]))
-            result = {
+            df: pd.DataFrame = compute_ichimoku_cloud(pd.DataFrame(message["data"]))
+            result: dict = {
                 "symbol": message.get("symbol"),
                 "timestamp": message.get("timestamp"),
                 "source": "IchimokuCloud",
@@ -85,6 +141,7 @@ def consume_rabbitmq() -> None:
             logger.error("Error processing message: %s", e)
             ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
 
+    # Start consuming messages
     channel.basic_consume(queue=RABBITMQ_QUEUE, on_message_callback=callback)
     logger.info("Waiting for messages from RabbitMQ...")
 
@@ -99,6 +156,14 @@ def consume_rabbitmq() -> None:
 
 
 def consume_sqs() -> None:
+    """Consumes messages from an SQS queue.
+
+    This function continuously polls an SQS queue for messages,
+    processes them using the `compute_ichimoku_cloud` function,
+    and sends the result to the output handler.
+
+    :return: None
+    """
     if not sqs_client or not SQS_QUEUE_URL:
         logger.error("SQS not initialized or missing queue URL.")
         return
@@ -107,26 +172,33 @@ def consume_sqs() -> None:
 
     while True:
         try:
+            # Poll the SQS queue for messages
             response = sqs_client.receive_message(
                 QueueUrl=SQS_QUEUE_URL,
                 MaxNumberOfMessages=10,
                 WaitTimeSeconds=10,
             )
 
+            # Process each message
             for msg in response.get("Messages", []):
                 try:
-                    body = json.loads(msg["Body"])
+                    # Load the message body as JSON
+                    body: dict[str, any] = json.loads(msg["Body"])
                     logger.info("Received SQS message: %s", body)
 
-                    df = compute_ichimoku_cloud(pd.DataFrame(body["data"]))
-                    result = {
+                    # Compute the Ichimoku Cloud analysis
+                    df: pd.DataFrame = compute_ichimoku_cloud(pd.DataFrame(body["data"]))
+                    result: dict[str, any] = {
                         "symbol": body.get("symbol"),
                         "timestamp": body.get("timestamp"),
                         "source": "IchimokuCloud",
                         "analysis": df.to_dict(orient="records"),
                     }
 
+                    # Send the result to the output handler
                     send_to_output(result)
+
+                    # Delete the message from the queue
                     sqs_client.delete_message(
                         QueueUrl=SQS_QUEUE_URL, ReceiptHandle=msg["ReceiptHandle"]
                     )
@@ -139,10 +211,25 @@ def consume_sqs() -> None:
 
 
 def consume_messages() -> None:
-    """Entry point to consume messages based on QUEUE_TYPE."""
+    """Entry point to consume messages based on QUEUE_TYPE.
+
+    This function checks the value of the QUEUE_TYPE environment variable and
+    calls the appropriate message consumer function.
+
+    Parameters
+    ----------
+        None
+
+    Returns
+    -------
+        None
+
+    """
     if QUEUE_TYPE == "rabbitmq":
+        # Consume messages from RabbitMQ
         consume_rabbitmq()
     elif QUEUE_TYPE == "sqs":
+        # Consume messages from SQS
         consume_sqs()
     else:
         logger.error("Invalid QUEUE_TYPE specified. Use 'rabbitmq' or 'sqs'.")
