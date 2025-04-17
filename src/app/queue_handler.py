@@ -64,7 +64,7 @@ def connect_to_rabbitmq() -> pika.BlockingConnection:
             retries -= 1
             logger.warning("RabbitMQ connection failed: %s. Retrying in 5s...", e)
             time.sleep(5)
-    raise ConnectionError("Could not connect to RabbitMQ after {} retries".format(retries))
+    raise ConnectionError(f"Could not connect to RabbitMQ after {retries} retries")
 
 
 def consume_rabbitmq() -> None:
