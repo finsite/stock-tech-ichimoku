@@ -1,123 +1,95 @@
-"""Handles message queue publishing for RabbitMQ and SQS.
-
-This module is used to send analyzed stock data to the appropriate output queue.
+"""
+Module to publish processed analysis data to RabbitMQ or AWS SQS.
 """
 
 import json
 import os
-
-import boto3
 import pika
+import boto3
+from botocore.exceptions import BotoCoreError, NoCredentialsError
 
 from app.logger import setup_logger
 
+# Initialize logger
 logger = setup_logger(__name__)
 
-SQS_CLIENT = boto3.client("sqs", region_name=os.getenv("AWS_REGION", "us-east-1"))
+# Get queue type from environment
+QUEUE_TYPE = os.getenv("QUEUE_TYPE", "rabbitmq").lower()
+
+# RabbitMQ config
+RABBITMQ_HOST = os.getenv("RABBITMQ_HOST", "localhost")
+RABBITMQ_EXCHANGE = os.getenv("RABBITMQ_EXCHANGE", "stock_analysis")
+RABBITMQ_ROUTING_KEY = os.getenv("RABBITMQ_ROUTING_KEY", "ichimoku")
+RABBITMQ_VHOST = os.getenv("RABBITMQ_VHOST", "/")
+RABBITMQ_USER = os.getenv("RABBITMQ_USER", "guest")
+RABBITMQ_PASSWORD = os.getenv("RABBITMQ_PASSWORD", "guest")
+
+# SQS config
+SQS_QUEUE_URL = os.getenv("SQS_QUEUE_URL", "")
+SQS_REGION = os.getenv("SQS_REGION", "us-east-1")
+
+# Initialize SQS client if needed
+sqs_client = None
+if QUEUE_TYPE == "sqs":
+    try:
+        sqs_client = boto3.client("sqs", region_name=SQS_REGION)
+        logger.info(f"SQS client initialized for region {SQS_REGION}")
+    except (BotoCoreError, NoCredentialsError) as e:
+        logger.error("Failed to initialize SQS client: %s", e)
+        sqs_client = None
 
 
-def send_to_rabbitmq(data: dict) -> None:
-    """Send a message to a RabbitMQ exchange.
-
-    This function sends a JSON-serialized message to a RabbitMQ exchange, using
-    the specified routing key and exchange name from environment variables.
+def publish_to_queue(payload: list[dict]) -> None:
+    """
+    Publishes the processed stock analysis results to RabbitMQ or SQS.
 
     Args:
-    ----
-        data (dict): The message to send.
-
-    Returns:
-    -------
-        None: No return value.
-
-    Raises:
-    ------
-        Exception: If the message could not be sent.
-
+        payload (list[dict]): A list of dictionaries representing processed results.
     """
+    for message in payload:
+        if QUEUE_TYPE == "rabbitmq":
+            _send_to_rabbitmq(message)
+        elif QUEUE_TYPE == "sqs":
+            _send_to_sqs(message)
+        else:
+            logger.error("Invalid QUEUE_TYPE specified. Use 'rabbitmq' or 'sqs'.")
+
+
+def _send_to_rabbitmq(data: dict) -> None:
+    """Helper to send a message to RabbitMQ."""
     try:
-        # Connect to RabbitMQ
+        credentials = pika.PlainCredentials(RABBITMQ_USER, RABBITMQ_PASSWORD)
         connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host=os.getenv("RABBITMQ_HOST", "rabbitmq"))
+            pika.ConnectionParameters(
+                host=RABBITMQ_HOST,
+                virtual_host=RABBITMQ_VHOST,
+                credentials=credentials,
+            )
         )
         channel = connection.channel()
 
-        # Publish the message
         channel.basic_publish(
-            # Get the exchange name from the environment
-            exchange=os.getenv("RABBITMQ_EXCHANGE", "stock_analysis"),
-            # Get the routing key from the environment
-            routing_key=os.getenv("RABBITMQ_ROUTING_KEY", "ichimoku"),
-            # JSON-serialize the message
+            exchange=RABBITMQ_EXCHANGE,
+            routing_key=RABBITMQ_ROUTING_KEY,
             body=json.dumps(data),
         )
-
-        # Close the connection
         connection.close()
-        logger.info("Sent message to RabbitMQ.")
+        logger.info("Published message to RabbitMQ")
     except Exception as e:
-        logger.error(f"Failed to send to RabbitMQ: {e}")
+        logger.error("Failed to publish message to RabbitMQ: %s", e)
 
 
-def send_to_sqs(data: dict[str, any]) -> None:
-    """Send a message to an AWS SQS queue.
+def _send_to_sqs(data: dict) -> None:
+    """Helper to send a message to AWS SQS."""
+    if not sqs_client or not SQS_QUEUE_URL:
+        logger.error("SQS client is not initialized or missing SQS_QUEUE_URL")
+        return
 
-    This function sends a JSON-serialized message to an AWS SQS queue, using
-    the specified queue URL from environment variables.
-
-    Args:
-    ----
-        data (dict[str, any]): The message to send.
-
-    Returns:
-    -------
-        None: No return value.
-
-    Raises:
-    ------
-        Exception: If the message could not be sent.
-
-    """
     try:
-        # Get the queue URL from the environment
-        queue_url: str = os.getenv("AWS_SQS_QUEUE_URL", "")
-
-        # Send the message
-        response: dict[str, any] = SQS_CLIENT.send_message(
-            QueueUrl=queue_url,
+        response = sqs_client.send_message(
+            QueueUrl=SQS_QUEUE_URL,
             MessageBody=json.dumps(data),
         )
-
-        # Log the message ID
-        logger.info(f"Sent message to SQS: {response.get('MessageId')}")
+        logger.info("Published message to SQS, MessageId: %s", response["MessageId"])
     except Exception as e:
-        # Log any errors
-        logger.error(f"Failed to send to SQS: {e}")
-
-
-def publish_to_queue(messages: list[dict[str, any]]) -> None:
-    """Dispatch multiple messages to the appropriate queue.
-
-    This function takes a list of analysis results and sends them to the
-    appropriate message queue. The type of queue is determined by the
-    environment variable "QUEUE_TYPE", which should be set to either
-    "rabbitmq" or "sqs".
-
-    Args:
-    ----
-        messages (list[dict[str, any]]): List of analysis results to be published.
-
-    Returns:
-    -------
-        None
-
-    """
-    queue_type: str = os.getenv("QUEUE_TYPE", "rabbitmq").lower()
-
-    for message in messages:
-        if queue_type == "sqs":
-            send_to_sqs(message)
-        elif queue_type == "rabbitmq":
-            send_to_rabbitmq(message)
-        else:
-            logger.error("Unsupported QUEUE_TYPE. Must be 'rabbitmq' or 'sqs'.")
+        logger.error("Failed to publish message to SQS: %s", e)

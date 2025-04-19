@@ -10,7 +10,7 @@ Ichimoku Cloud indicators for a given DataFrame of stock data.
 import pandas as pd
 
 from app.logger import setup_logger
-
+from app.output_handler import send_to_output
 # Initialize logger
 logger = setup_logger(__name__)
 
