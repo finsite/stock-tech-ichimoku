@@ -1,0 +1,22 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stock-tech-ichimoku
+  labels:
+    app: stock-tech-ichimoku
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stock-tech-ichimoku
+  template:
+    metadata:
+      labels:
+        app: stock-tech-ichimoku
+    spec:
+      containers:
+        - name: stock-tech-ichimoku
+          image: stock-tech-ichimoku:latest
+          ports:
+            - containerPort: 8080
