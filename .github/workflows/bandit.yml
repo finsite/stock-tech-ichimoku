@@ -18,7 +18,11 @@ on:
     # The branches below must be a subset of the branches above
     branches: [ "main" ]
   schedule:
+<<<<<<< HEAD
     - cron: '40 22 * * 0'
+=======
+    - cron: '24 5 * * 2'
+>>>>>>> 80e583f2af0d53e853a77ae54ad57c77423ce2d5
 
 jobs:
   bandit:
