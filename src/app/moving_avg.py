@@ -1,4 +1,5 @@
-"""Module for calculating Ichimoku Cloud components.
+"""
+Module for calculating Ichimoku Cloud components.
 
 This module provides functionality to compute:
 - Tenkan-sen (Conversion Line)
@@ -15,7 +16,8 @@ import pandas as pd
 
 
 def calculate_ichimoku(data: pd.DataFrame) -> pd.DataFrame:
-    """Calculate Ichimoku Cloud indicators for the given stock data.
+    """
+    Calculate Ichimoku Cloud indicators for the given stock data.
 
     The Ichimoku Cloud is a set of technical indicators used to gauge momentum,
     as well as to identify trend direction and potential buy/sell signals.
@@ -38,7 +40,6 @@ def calculate_ichimoku(data: pd.DataFrame) -> pd.DataFrame:
     Returns:
     -------
         pd.DataFrame: The input DataFrame with Ichimoku indicator columns added.
-
     """
     high: pd.Series = data["High"]
     low: pd.Series = data["Low"]

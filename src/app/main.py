@@ -1,4 +1,5 @@
-"""Main entry point for Stock-Tech-Ichimoku.
+"""
+Main entry point for Stock-Tech-Ichimoku.
 
 This script starts the Ichimoku Cloud analysis service by consuming messages
 from a configured queue and processing them for analysis output.
@@ -6,7 +7,6 @@ from a configured queue and processing them for analysis output.
 Attributes
 ----------
     logger (logging.Logger): Configured logger for the application.
-
 """
 
 import os
@@ -23,7 +23,8 @@ logger = setup_logger(__name__)
 
 
 def main() -> None:
-    """Main entry point of the Ichimoku Cloud Analysis Service.
+    """
+    Main entry point of the Ichimoku Cloud Analysis Service.
 
     This function starts the service by consuming messages from the configured
     message queue and processing them for technical insights.
@@ -35,7 +36,6 @@ def main() -> None:
     Returns
     -------
     None: No return value.
-
     """
     logger.info("Starting Ichimoku Cloud Analysis Service...")
     consume_messages()

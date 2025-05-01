@@ -1,4 +1,5 @@
-"""A Python project template with CI/CD workflows.
+"""
+A Python project template with CI/CD workflows.
 
 This template provides a basic directory structure and some helpful files to get
 started with a Python project. It includes a ``.github`` directory with workflows
@@ -9,7 +10,6 @@ The template uses ``setuptools`` to build and install the project. The
 
 The project is licensed under the MIT License, which is a permissive open-source
 license.
-
 """
 
 from setuptools import find_packages, setup

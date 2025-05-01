@@ -1,7 +1,8 @@
-"""Handles message queue consumption for RabbitMQ and SQS.
+"""
+Handles message queue consumption for RabbitMQ and SQS.
 
-This module receives stock data, applies Ichimoku Cloud analysis,
-and sends processed results to the output handler.
+This module receives stock data, applies Ichimoku Cloud analysis, and sends processed
+results to the output handler.
 """
 
 import json
@@ -39,8 +40,9 @@ if QUEUE_TYPE == "sqs":
 
 
 def connect_to_rabbitmq() -> pika.BlockingConnection:
-    """Establishes a connection to RabbitMQ. This function will retry up to 5 times
-    if the connection fails, waiting 5 seconds between each attempt.
+    """
+    Establishes a connection to RabbitMQ. This function will retry up to 5 times if the
+    connection fails, waiting 5 seconds between each attempt.
 
     Returns
     -------
@@ -49,7 +51,6 @@ def connect_to_rabbitmq() -> pika.BlockingConnection:
     Raises
     ------
         ConnectionError: If the connection cannot be established after retries.
-
     """
     retries: int = 5
     while retries > 0:
@@ -68,7 +69,8 @@ def connect_to_rabbitmq() -> pika.BlockingConnection:
 
 
 def consume_rabbitmq() -> None:
-    """Consumes messages from RabbitMQ and applies Ichimoku Cloud analysis.
+    """
+    Consumes messages from RabbitMQ and applies Ichimoku Cloud analysis.
 
     The messages are expected to be in JSON format with the following structure:
     {
@@ -84,7 +86,6 @@ def consume_rabbitmq() -> None:
     Returns
     -------
         None
-
     """
     connection: pika.BlockingConnection = connect_to_rabbitmq()
     channel: pika.adapters.blocking_connection.BlockingChannel = connection.channel()
@@ -104,7 +105,8 @@ def consume_rabbitmq() -> None:
         properties: pika.spec.BasicProperties,
         body: bytes,
     ) -> None:
-        """Callback function for the RabbitMQ consumer.
+        """
+        Callback function for the RabbitMQ consumer.
 
         This function is called when a message is received from RabbitMQ.
 
@@ -118,7 +120,6 @@ def consume_rabbitmq() -> None:
         Returns:
         -------
             None
-
         """
         try:
             message: dict = json.loads(body)
@@ -156,7 +157,8 @@ def consume_rabbitmq() -> None:
 
 
 def consume_sqs() -> None:
-    """Consumes messages from an SQS queue.
+    """
+    Consumes messages from an SQS queue.
 
     This function continuously polls an SQS queue for messages,
     processes them using the `compute_ichimoku_cloud` function,
@@ -211,7 +213,8 @@ def consume_sqs() -> None:
 
 
 def consume_messages() -> None:
-    """Entry point to consume messages based on QUEUE_TYPE.
+    """
+    Entry point to consume messages based on QUEUE_TYPE.
 
     This function checks the value of the QUEUE_TYPE environment variable and
     calls the appropriate message consumer function.
@@ -223,7 +226,6 @@ def consume_messages() -> None:
     Returns
     -------
         None
-
     """
     if QUEUE_TYPE == "rabbitmq":
         # Consume messages from RabbitMQ
