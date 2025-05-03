@@ -1,65 +1,48 @@
 """
-Module for calculating Ichimoku Cloud components.
+Ichimoku Moving Average Utilities.
 
-This module provides functionality to compute:
-- Tenkan-sen (Conversion Line)
-- Kijun-sen (Base Line)
-- Senkou Span A (Leading Span A)
-- Senkou Span B (Leading Span B)
-- Chikou Span (Lagging Span)
-
-These indicators are useful for trend direction, support/resistance levels,
-and potential buy/sell signals.
+Calculates Tenkan-sen, Kijun-sen, and Senkou Span B from stock data.
 """
 
+from typing import cast
+
 import pandas as pd
+from pandas import Series
+
+from app.logger import setup_logger
+
+logger = setup_logger(__name__)
 
 
-def calculate_ichimoku(data: pd.DataFrame) -> pd.DataFrame:
+def calculate_ichimoku_components(data: pd.DataFrame) -> dict[str, Series]:
     """
-    Calculate Ichimoku Cloud indicators for the given stock data.
-
-    The Ichimoku Cloud is a set of technical indicators used to gauge momentum,
-    as well as to identify trend direction and potential buy/sell signals.
-
-    Ichimoku Cloud components:
-    - Tenkan-sen (Conversion Line): a mid-point between the highest high and lowest low
-      over the past 9 periods.
-    - Kijun-sen (Base Line): a mid-point between the highest high and lowest low over
-      the past 26 periods.
-    - Senkou Span A (Leading Span A): the average of Tenkan-sen and Kijun-sen, shifted
-      forward 26 periods.
-    - Senkou Span B (Leading Span B): the average of the highest high and lowest low
-      over the past 52 periods, shifted forward 26 periods.
-    - Chikou Span (Lagging Span): the current price shifted back 26 periods.
+    Calculate Ichimoku components from historical OHLC stock data.
 
     Args:
-    ----
-        data (pd.DataFrame): A DataFrame containing 'High', 'Low', and 'Close' columns.
+        data (pd.DataFrame): Historical stock price data.
 
     Returns:
-    -------
-        pd.DataFrame: The input DataFrame with Ichimoku indicator columns added.
+        dict[str, Series]: Dictionary containing Ichimoku indicators.
     """
-    high: pd.Series = data["High"]
-    low: pd.Series = data["Low"]
-    close: pd.Series = data["Close"]
+    try:
+        high_prices = cast(Series, data["High"])
+        low_prices = cast(Series, data["Low"])
 
-    # Tenkan-sen (Conversion Line)
-    data["tenkan_sen"] = (high.rolling(window=9).max() + low.rolling(window=9).min()) / 2
+        tenkan_sen = (high_prices.rolling(window=9).max() + low_prices.rolling(window=9).min()) / 2
+        kijun_sen = (high_prices.rolling(window=26).max() + low_prices.rolling(window=26).min()) / 2
+        senkou_span_b = (
+            high_prices.rolling(window=52).max() + low_prices.rolling(window=52).min()
+        ) / 2
 
-    # Kijun-sen (Base Line)
-    data["kijun_sen"] = (high.rolling(window=26).max() + low.rolling(window=26).min()) / 2
+        return {
+            "TenkanSen": tenkan_sen,
+            "KijunSen": kijun_sen,
+            "SenkouSpanB": senkou_span_b,
+        }
 
-    # Senkou Span A (Leading Span A)
-    data["senkou_span_a"] = ((data["tenkan_sen"] + data["kijun_sen"]) / 2).shift(26)
-
-    # Senkou Span B (Leading Span B)
-    data["senkou_span_b"] = (
-        (high.rolling(window=52).max() + low.rolling(window=52).min()) / 2
-    ).shift(26)
-
-    # Chikou Span (Lagging Span)
-    data["chikou_span"] = close.shift(-26)
-
-    return data
+    except KeyError as e:
+        logger.error(f"Missing column in input data: {e}")
+        return {}
+    except Exception as e:
+        logger.error(f"Error calculating Ichimoku components: {e}")
+        return {}
