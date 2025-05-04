@@ -27,6 +27,11 @@ def compute_ichimoku_cloud(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
     -------
         pd.DataFrame: DataFrame with Ichimoku Cloud indicators added.
+
+    Args:
+      df: pd.DataFrame:
+
+    Returns:
     """
     try:
         # Validate input

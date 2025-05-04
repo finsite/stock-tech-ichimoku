@@ -280,13 +280,7 @@ if QUEUE_TYPE == "sqs":
 
 
 def connect_to_rabbitmq() -> pika.BlockingConnection:
-    """
-    Establishes a connection to RabbitMQ with retries.
-
-    Returns
-    -------
-    pika.BlockingConnection
-    """
+    """Establishes a connection to RabbitMQ with retries."""
     retries: int = 5
     while retries > 0:
         try:
@@ -315,7 +309,17 @@ def consume_rabbitmq() -> None:
     )
 
     def callback(ch: Any, method: Any, properties: Any, body: bytes) -> None:
-        """RabbitMQ message callback."""
+        """
+        RabbitMQ message callback.
+
+        Args:
+          ch: Any:
+          method: Any:
+          properties: Any:
+          body: bytes:
+
+        Returns:
+        """
         try:
             message: dict[str, Any] = json.loads(body)
             logger.info("Received message: %s", message)

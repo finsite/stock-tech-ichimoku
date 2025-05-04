@@ -33,9 +33,9 @@ def main() -> None:
     depending on the configuration. The processed messages will be logged
     to the console in JSON format.
 
-    Returns
-    -------
-    None: No return value.
+    Args:
+
+    Returns:
     """
     logger.info("Starting Ichimoku Cloud Analysis Service...")
     consume_messages()
