@@ -124,7 +124,6 @@ repos:
     hooks:
       - id: yamlfix
         files: \.(yaml|yml)$
-
   - repo: https://github.com/commitizen-tools/commitizen
     rev: v4.6.2
     hooks:
