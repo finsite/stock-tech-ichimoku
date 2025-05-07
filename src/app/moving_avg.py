@@ -1,5 +1,4 @@
-"""
-Ichimoku Moving Average Utilities.
+"""Ichimoku Moving Average Utilities.
 
 Calculates Tenkan-sen, Kijun-sen, and Senkou Span B from stock data.
 """
@@ -15,8 +14,7 @@ logger = setup_logger(__name__)
 
 
 def calculate_ichimoku_components(data: pd.DataFrame) -> dict[str, Series]:
-    """
-    Calculate Ichimoku components from historical OHLC stock data.
+    """Calculate Ichimoku components from historical OHLC stock data.
 
     Args:
       data(pd.DataFrame): Historical stock price data.
@@ -24,6 +22,7 @@ def calculate_ichimoku_components(data: pd.DataFrame) -> dict[str, Series]:
 
     Returns:
       dict[str, Series]: Dictionary containing Ichimoku indicators.
+
     """
     try:
         high_prices = cast(Series, data["High"])
