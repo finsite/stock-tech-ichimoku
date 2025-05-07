@@ -4,6 +4,12 @@
 - Fixing workflows and dependencies (Mark Quinn)
 - bump: patch version + changelog [skip ci] (github-actions[bot])
 
+## v0.3.2 (2025-05-07)
+
+### Fix
+
+- **lint**: Fix pre-commit and disable pytest workflow
+
 ## v0.3.1 (2025-05-07)
 
 ### Fix
