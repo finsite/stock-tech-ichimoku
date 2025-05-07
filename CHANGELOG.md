@@ -4,6 +4,12 @@
 - Fixing workflows and dependencies (Mark Quinn)
 - bump: patch version + changelog [skip ci] (github-actions[bot])
 
+## v0.3.1 (2025-05-07)
+
+### Fix
+
+- **docker**: Fix workflow not getting version
+
 ## v0.3.0 (2025-05-06)
 
 ### Fix
