@@ -237,8 +237,8 @@
 #         logger.error("Invalid QUEUE_TYPE specified. Use 'rabbitmq' or 'sqs'.")
 """Handles message queue consumption for RabbitMQ and SQS.
 
-This module receives stock data, applies Ichimoku Cloud analysis, and sends processed
-results to the output handler.
+This module receives stock data, applies Ichimoku Cloud analysis, and
+sends processed results to the output handler.
 """
 
 import json
@@ -315,9 +315,12 @@ def consume_rabbitmq() -> None:
           method: Any:
           properties: Any:
           body: bytes:
+          ch: Any:
+          method: Any:
+          properties: Any:
+          body: bytes:
 
         Returns:
-
         """
         try:
             message: dict[str, Any] = json.loads(body)

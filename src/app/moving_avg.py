@@ -19,10 +19,10 @@ def calculate_ichimoku_components(data: pd.DataFrame) -> dict[str, Series]:
     Args:
       data(pd.DataFrame): Historical stock price data.
       data: pd.DataFrame:
+      data: pd.DataFrame:
 
     Returns:
       dict[str, Series]: Dictionary containing Ichimoku indicators.
-
     """
     try:
         high_prices = cast(Series, data["High"])

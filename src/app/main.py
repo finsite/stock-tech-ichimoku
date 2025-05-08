@@ -6,7 +6,6 @@ from a configured queue and processing them for analysis output.
 Attributes
 ----------
     logger (logging.Logger): Configured logger for the application.
-
 """
 
 import os
@@ -35,7 +34,6 @@ def main() -> None:
     Args:
 
     Returns:
-
     """
     logger.info("Starting Ichimoku Cloud Analysis Service...")
     consume_messages()

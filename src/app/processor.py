@@ -31,6 +31,10 @@ def compute_ichimoku_cloud(df: pd.DataFrame) -> pd.DataFrame:
 
     Returns:
 
+    Args:
+      df: pd.DataFrame:
+
+    Returns:
     """
     try:
         # Validate input
