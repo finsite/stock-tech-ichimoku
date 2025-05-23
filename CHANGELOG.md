@@ -1,4 +1,12 @@
-## Unreleased
+## v0.4.0 (2025-05-23)
+
+### Feat
+
+- add Ichimoku baseline logic
+
+### Fix
+
+- **docs**: Running docformatter to fix repos
 
 ## v0.3.3 (2025-05-07)
 

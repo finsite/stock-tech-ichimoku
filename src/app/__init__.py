@@ -1,1 +1,1 @@
-__version__ = "0.3.4"  # Matches pyproject.toml version
+__version__ = "0.4.0"  # Matches pyproject.toml version
