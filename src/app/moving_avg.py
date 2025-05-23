@@ -3,26 +3,69 @@
 Calculates Tenkan-sen, Kijun-sen, and Senkou Span B from stock data.
 """
 
-from typing import cast
+from typing import Any, cast
 
 import pandas as pd
-from pandas import Series
+from pandas import Series, DataFrame
 
 from app.logger import setup_logger
 
 logger = setup_logger(__name__)
 
 
-def calculate_ichimoku_components(data: pd.DataFrame) -> dict[str, Series]:
+def analyze(data: dict[str, Any]) -> dict[str, Any]:
+    """Main entrypoint for Ichimoku Moving Average analysis.
+
+    Args:
+        data (dict[str, Any]): Input message containing 'symbol', 'timestamp', and 'history'.
+
+    Returns:
+        dict[str, Any]: Analysis results with Ichimoku components.
+    """
+    try:
+        df = pd.DataFrame(data.get("history", []))
+        symbol = data.get("symbol", "N/A")
+        timestamp = data.get("timestamp", "N/A")
+
+        if df.empty or not {"High", "Low"}.issubset(df.columns):
+            logger.warning("Missing or invalid history data for symbol: %s", symbol)
+            return {
+                "symbol": symbol,
+                "timestamp": timestamp,
+                "error": "Missing or invalid history data",
+            }
+
+        components = calculate_ichimoku_components(df)
+
+        result = {
+            "symbol": symbol,
+            "timestamp": timestamp,
+            "source": "IchimokuComponents",
+            "components": {
+                k: v.dropna().tolist() for k, v in components.items()
+            },
+        }
+
+        logger.info("Processed Ichimoku components for %s at %s", symbol, timestamp)
+        return result
+
+    except Exception as e:
+        logger.error("Ichimoku component analysis failed: %s", e)
+        return {
+            "symbol": data.get("symbol", "N/A"),
+            "timestamp": data.get("timestamp", "N/A"),
+            "error": str(e),
+        }
+
+
+def calculate_ichimoku_components(data: DataFrame) -> dict[str, Series]:
     """Calculate Ichimoku components from historical OHLC stock data.
 
     Args:
-      data(pd.DataFrame): Historical stock price data.
-      data: pd.DataFrame:
-      data: pd.DataFrame:
+        data (pd.DataFrame): Historical stock price data.
 
     Returns:
-      dict[str, Series]: Dictionary containing Ichimoku indicators.
+        dict[str, Series]: Dictionary containing Ichimoku indicators.
     """
     try:
         high_prices = cast(Series, data["High"])
@@ -41,8 +84,8 @@ def calculate_ichimoku_components(data: pd.DataFrame) -> dict[str, Series]:
         }
 
     except KeyError as e:
-        logger.error(f"Missing column in input data: {e}")
+        logger.error("Missing column in input data: %s", e)
         return {}
     except Exception as e:
-        logger.error(f"Error calculating Ichimoku components: {e}")
+        logger.error("Error calculating Ichimoku components: %s", e)
         return {}

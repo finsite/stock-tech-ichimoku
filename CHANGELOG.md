@@ -1,24 +1,19 @@
-# Changelog
-
-- Fixing workflows and dependencies (Mark Quinn)
-- bump: patch version + changelog [skip ci] (github-actions[bot])
+## Unreleased
 
 ## v0.3.3 (2025-05-07)
 
 ### Fix
 
+- **docs**: Running docformatter to fix repos
 - **test**: Disable pytest performance benchmark
 
 ## v0.3.2 (2025-05-07)
-
-### Fix
-
-- **lint**: Fix pre-commit and disable pytest workflow
 
 ## v0.3.1 (2025-05-07)
 
 ### Fix
 
+- **lint**: Fix pre-commit and disable pytest workflow
 - **docker**: Fix workflow not getting version
 
 ## v0.3.0 (2025-05-06)
