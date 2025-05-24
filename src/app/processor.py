@@ -4,6 +4,7 @@ Provides `analyze()` as the main entry point for queue-based workflows.
 """
 
 from typing import Any
+
 import pandas as pd
 
 from app.logger import setup_logger
@@ -21,6 +22,7 @@ def analyze(data: dict[str, Any]) -> dict[str, Any]:
     Returns:
     -------
         dict: Processed analysis results or error structure.
+
     """
     try:
         symbol = data.get("symbol", "N/A")
@@ -62,6 +64,7 @@ def compute_ichimoku_cloud(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
     -------
         pd.DataFrame: Modified DataFrame with Ichimoku indicators.
+
     """
     try:
         df["tenkan_sen"] = (

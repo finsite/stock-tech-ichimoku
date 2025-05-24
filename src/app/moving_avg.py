@@ -6,7 +6,7 @@ Calculates Tenkan-sen, Kijun-sen, and Senkou Span B from stock data.
 from typing import Any, cast
 
 import pandas as pd
-from pandas import Series, DataFrame
+from pandas import DataFrame, Series
 
 from app.logger import setup_logger
 
@@ -17,10 +17,13 @@ def analyze(data: dict[str, Any]) -> dict[str, Any]:
     """Main entrypoint for Ichimoku Moving Average analysis.
 
     Args:
+    ----
         data (dict[str, Any]): Input message containing 'symbol', 'timestamp', and 'history'.
 
     Returns:
+    -------
         dict[str, Any]: Analysis results with Ichimoku components.
+
     """
     try:
         df = pd.DataFrame(data.get("history", []))
@@ -41,9 +44,7 @@ def analyze(data: dict[str, Any]) -> dict[str, Any]:
             "symbol": symbol,
             "timestamp": timestamp,
             "source": "IchimokuComponents",
-            "components": {
-                k: v.dropna().tolist() for k, v in components.items()
-            },
+            "components": {k: v.dropna().tolist() for k, v in components.items()},
         }
 
         logger.info("Processed Ichimoku components for %s at %s", symbol, timestamp)
@@ -62,10 +63,13 @@ def calculate_ichimoku_components(data: DataFrame) -> dict[str, Series]:
     """Calculate Ichimoku components from historical OHLC stock data.
 
     Args:
+    ----
         data (pd.DataFrame): Historical stock price data.
 
     Returns:
+    -------
         dict[str, Series]: Dictionary containing Ichimoku indicators.
+
     """
     try:
         high_prices = cast(Series, data["High"])

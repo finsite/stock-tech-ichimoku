@@ -6,7 +6,6 @@ and sends results to the output handler.
 
 import json
 import time
-from typing import Any
 
 import boto3
 import pandas as pd
@@ -20,6 +19,7 @@ from app.output_handler import send_to_output
 from app.processor import compute_ichimoku_cloud
 
 logger = setup_logger(__name__)
+
 
 def connect_to_rabbitmq() -> pika.BlockingConnection:
     """Connects to RabbitMQ using config-based credentials."""
@@ -46,6 +46,7 @@ def connect_to_rabbitmq() -> pika.BlockingConnection:
             logger.warning("RabbitMQ connection failed: %s. Retrying in %ss...", e, retry_delay)
             time.sleep(retry_delay)
     raise ConnectionError("RabbitMQ connection failed after retries")
+
 
 def consume_rabbitmq() -> None:
     """Consumes messages from RabbitMQ."""
@@ -94,6 +95,7 @@ def consume_rabbitmq() -> None:
     finally:
         connection.close()
         logger.info("RabbitMQ connection closed.")
+
 
 def consume_sqs() -> None:
     """Consumes messages from Amazon SQS."""
@@ -144,6 +146,7 @@ def consume_sqs() -> None:
         except Exception as e:
             logger.error("SQS polling failed: %s", e)
             time.sleep(polling_interval)
+
 
 def consume_messages() -> None:
     """Dispatches to the appropriate queue consumer."""
