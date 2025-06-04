@@ -27,6 +27,7 @@ def analyze(data: dict[str, Any]) -> dict[str, Any]:
     :param Any: param data:
     :param data: dict[str:
     :param data: dict[str:
+    :param Any: param data: dict[str:
     :param Any: 
     :param data: dict[str: 
     :param Any]: 
@@ -78,6 +79,7 @@ def calculate_ichimoku_components(data: DataFrame) -> dict[str, Series]:
     :param data: DataFrame:
     :param data: type data: DataFrame :
     :param data: type data: DataFrame :
+    :param data: DataFrame:
     :param data: DataFrame:
     :param data: DataFrame:
     :param data: DataFrame: 
