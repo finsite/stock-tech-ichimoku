@@ -20,10 +20,6 @@ def analyze(data: dict[str, Any]) -> dict[str, Any]:
     ----
         data (dict[str, Any]): Input message containing 'symbol', 'timestamp', and 'history'.
 
-    Returns:
-    -------
-        dict[str, Any]: Analysis results with Ichimoku components.
-
     Parameters
     ----------
     data :
@@ -34,13 +30,16 @@ def analyze(data: dict[str, Any]) -> dict[str, Any]:
         param data: dict[str:
     Any :
 
-    data: dict[str :
+    data : dict[str :
 
     Any] :
+
+    data: dict[str :
 
 
     Returns
     -------
+
 
     """
     try:
@@ -84,10 +83,6 @@ def calculate_ichimoku_components(data: DataFrame) -> dict[str, Series]:
     ----
         data (pd.DataFrame): Historical stock price data.
 
-    Returns:
-    -------
-        dict[str, Series]: Dictionary containing Ichimoku indicators.
-
     Parameters
     ----------
     data :
@@ -96,11 +91,14 @@ def calculate_ichimoku_components(data: DataFrame) -> dict[str, Series]:
         DataFrame:
     data :
         DataFrame:
+    data : DataFrame :
+
     data: DataFrame :
 
 
     Returns
     -------
+
 
     """
     try:

@@ -19,10 +19,6 @@ def analyze(data: dict[str, Any]) -> dict[str, Any]:
     ----
         data (dict): Dictionary with 'symbol', 'timestamp', and 'data' (historical OHLC list).
 
-    Returns:
-    -------
-        dict: Processed analysis results or error structure.
-
     Parameters
     ----------
     data :
@@ -33,13 +29,16 @@ def analyze(data: dict[str, Any]) -> dict[str, Any]:
         param data: dict[str:
     Any :
 
-    data: dict[str :
+    data : dict[str :
 
     Any] :
+
+    data: dict[str :
 
 
     Returns
     -------
+
 
     """
     try:
@@ -79,10 +78,6 @@ def compute_ichimoku_cloud(df: pd.DataFrame) -> pd.DataFrame:
     ----
         df (pd.DataFrame): DataFrame with 'High', 'Low', 'Close' columns.
 
-    Returns:
-    -------
-        pd.DataFrame: Modified DataFrame with Ichimoku indicators.
-
     Parameters
     ----------
     df :
@@ -91,11 +86,14 @@ def compute_ichimoku_cloud(df: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame:
     df :
         pd.DataFrame:
+    df : pd.DataFrame :
+
     df: pd.DataFrame :
 
 
     Returns
     -------
+
 
     """
     try:
