@@ -25,6 +25,7 @@ def analyze(data: dict[str, Any]) -> dict[str, Any]:
         dict[str, Any]: Analysis results with Ichimoku components.
 
     :param data: dict[str:
+    :param Any: param data: dict[str:
     :param Any: 
     :param data: dict[str: 
     :param Any]: 
@@ -75,6 +76,7 @@ def calculate_ichimoku_components(data: DataFrame) -> dict[str, Series]:
     -------
         dict[str, Series]: Dictionary containing Ichimoku indicators.
 
+    :param data: DataFrame:
     :param data: DataFrame:
     :param data: DataFrame: 
 
