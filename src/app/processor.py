@@ -25,6 +25,8 @@ def analyze(data: dict[str, Any]) -> dict[str, Any]:
     :param Any: param data:
     :param Any: param data:
     :param data: dict[str:
+    :param data: dict[str:
+    :param Any: 
     :param data: dict[str: 
     :param Any]: 
 
@@ -71,6 +73,7 @@ def compute_ichimoku_cloud(df: pd.DataFrame) -> pd.DataFrame:
     :param df: pd.DataFrame:
     :param df: type df: pd.DataFrame :
     :param df: type df: pd.DataFrame :
+    :param df: pd.DataFrame:
     :param df: pd.DataFrame:
     :param df: pd.DataFrame: 
 
