@@ -15,32 +15,23 @@ logger = setup_logger(__name__)
 
 def analyze(data: dict[str, Any]) -> dict[str, Any]:
     """Main entrypoint for Ichimoku Moving Average analysis.
-
+    
     Args:
     ----
         data (dict[str, Any]): Input message containing 'symbol', 'timestamp', and 'history'.
 
-    Parameters
-    ----------
-    data :
-        dict[str:
-    Any :
-        param data: dict[str:
-    Any :
-        param data: dict[str:
-    Any :
+    :param data: dict[str:
+    :param Any: param data: dict[str:
+    :param Any: param data: dict[str:
+    :param Any: 
+    :param data: 
+    :type data: dict[str :
+    :param Any]: 
+    :param data: 
+    :type data: dict[str :
+    :param data: dict[str: 
 
-    data : dict[str :
-
-    Any] :
-
-    data: dict[str :
-
-
-    Returns
-    -------
-
-
+    
     """
     try:
         df = pd.DataFrame(data.get("history", []))
@@ -78,28 +69,21 @@ def analyze(data: dict[str, Any]) -> dict[str, Any]:
 
 def calculate_ichimoku_components(data: DataFrame) -> dict[str, Series]:
     """Calculate Ichimoku components from historical OHLC stock data.
-
+    
     Args:
     ----
         data (pd.DataFrame): Historical stock price data.
 
-    Parameters
-    ----------
-    data :
-        DataFrame:
-    data :
-        DataFrame:
-    data :
-        DataFrame:
-    data : DataFrame :
+    :param data: DataFrame:
+    :param data: DataFrame:
+    :param data: DataFrame:
+    :param data: 
+    :type data: DataFrame :
+    :param data: 
+    :type data: DataFrame :
+    :param data: DataFrame: 
 
-    data: DataFrame :
-
-
-    Returns
-    -------
-
-
+    
     """
     try:
         high_prices = cast(Series, data["High"])

@@ -14,32 +14,23 @@ logger = setup_logger(__name__)
 
 def analyze(data: dict[str, Any]) -> dict[str, Any]:
     """Analyzes stock data and returns Ichimoku Cloud indicators.
-
+    
     Args:
     ----
         data (dict): Dictionary with 'symbol', 'timestamp', and 'data' (historical OHLC list).
 
-    Parameters
-    ----------
-    data :
-        dict[str:
-    Any :
-        param data: dict[str:
-    Any :
-        param data: dict[str:
-    Any :
+    :param data: dict[str:
+    :param Any: param data: dict[str:
+    :param Any: param data: dict[str:
+    :param Any: 
+    :param data: 
+    :type data: dict[str :
+    :param Any]: 
+    :param data: 
+    :type data: dict[str :
+    :param data: dict[str: 
 
-    data : dict[str :
-
-    Any] :
-
-    data: dict[str :
-
-
-    Returns
-    -------
-
-
+    
     """
     try:
         symbol = data.get("symbol", "N/A")
@@ -73,28 +64,21 @@ def analyze(data: dict[str, Any]) -> dict[str, Any]:
 
 def compute_ichimoku_cloud(df: pd.DataFrame) -> pd.DataFrame:
     """Computes Ichimoku Cloud indicators and adds them to the DataFrame.
-
+    
     Args:
     ----
         df (pd.DataFrame): DataFrame with 'High', 'Low', 'Close' columns.
 
-    Parameters
-    ----------
-    df :
-        pd.DataFrame:
-    df :
-        pd.DataFrame:
-    df :
-        pd.DataFrame:
-    df : pd.DataFrame :
+    :param df: pd.DataFrame:
+    :param df: pd.DataFrame:
+    :param df: pd.DataFrame:
+    :param df: 
+    :type df: pd.DataFrame :
+    :param df: 
+    :type df: pd.DataFrame :
+    :param df: pd.DataFrame: 
 
-    df: pd.DataFrame :
-
-
-    Returns
-    -------
-
-
+    
     """
     try:
         df["tenkan_sen"] = (
