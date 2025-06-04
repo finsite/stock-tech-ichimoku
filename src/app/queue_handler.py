@@ -70,13 +70,11 @@ def consume_rabbitmq() -> None:
         :param properties: param body: bytes:
         :param method: param body: bytes:
         :param body: bytes:
-        :param body: 
-        :type body: bytes :
-        :param body: 
-        :type body: bytes :
+        :param body: type body: bytes :
+        :param body: type body: bytes :
+        :param body: bytes:
         :param body: bytes: 
 
-        
         """
         try:
             message = json.loads(body)
