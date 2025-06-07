@@ -1,18 +1,31 @@
-## v0.4.0 (2025-05-23)
+## v0.1.0 (2025-06-05)
 
 ### Feat
 
-- add Ichimoku baseline logic
+- **sync**: add full sync_if_needed.py script with logging and Makefile support
+- **versioning**: enforce version consistency across pyproject.toml, __init__.py, and changelog
+- **poller**: standard todo across all pollers
 
 ### Fix
 
-- **docs**: Running docformatter to fix repos
+- **deps**: recompile requirements to resolve dependency conflicts
+- **files**: Address workflows timing out issues
+- **deps**: recompile requirements-dev.txt and resolve conflicts
+- **deps**: standardize termcolor to 2.5.0
+- **deps**: standardize termcolor to 2.5.0
+- **files**: Cleanup redundant files and standardize
 
 ## v0.3.4 (2025-05-08)
 
 ### Fix
 
-- **docs**: Running docformatter to fix repos
+- **poller**: integrate updates
+
+## v0.4.0 (2025-05-23)
+
+### Feat
+
+- add Ichimoku baseline logic
 
 ## v0.3.3 (2025-05-07)
 
