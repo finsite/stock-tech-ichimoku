@@ -1,3 +1,59 @@
+## v0.4.0 (2025-06-07)
+
+### Feat
+
+- **sync**: add full sync_if_needed.py script with logging and Makefile support
+- **versioning**: enforce version consistency across pyproject.toml, __init__.py, and changelog
+- **poller**: standard todo across all pollers
+
+### Fix
+
+- **files**: verify pyproject.toml has all required fields
+- **deps**: recompile requirements to resolve dependency conflicts
+- **files**: Address workflows timing out issues
+- **deps**: recompile requirements-dev.txt and resolve conflicts
+- **deps**: standardize termcolor to 2.5.0
+- **deps**: standardize termcolor to 2.5.0
+- **files**: Cleanup redundant files and standardize
+
+## v0.3.4 (2025-05-08)
+
+### Feat
+
+- add Ichimoku baseline logic
+
+### Fix
+
+- **poller**: integrate updates
+
+## v0.3.3 (2025-05-07)
+
+### Fix
+
+- **docs**: Running docformatter to fix repos
+- **test**: Disable pytest performance benchmark
+
+## v0.3.2 (2025-05-07)
+
+## v0.3.1 (2025-05-07)
+
+### Fix
+
+- **lint**: Fix pre-commit and disable pytest workflow
+- **docker**: Fix workflow not getting version
+
+## v0.3.0 (2025-05-06)
+
+### Fix
+
+- **docs**: Merge old pyproject.toml into new one with commitzen
+
+## v0.1.41 (2025-05-05)
+
+### Feat
+
+- **docs**: Update changlog generation to commitzen
+
 ## v0.1.0 (2025-06-05)
 
 ### Feat
