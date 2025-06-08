@@ -8,7 +8,7 @@ from typing import Any, cast
 import pandas as pd
 from pandas import DataFrame, Series
 
-from app.logger import setup_logger
+from app.utils.setup_logger import setup_logger
 
 logger = setup_logger(__name__)
 

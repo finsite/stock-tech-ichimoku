@@ -1,171 +1,47 @@
-"""Queue handler for stock-tech-ichimoku.
+"""Module to handle output of analysis results to a chosen output target.
 
-Consumes messages from RabbitMQ or SQS, applies Ichimoku Cloud analysis,
-and sends results to the output handler.
+This implementation logs the result, prints it to stdout, and sends the
+data to RabbitMQ or SQS, unless OUTPUT_MODE is set to 'log'.
 """
 
 import json
-import time
+from typing import Any, cast
 
-import boto3
-import pandas as pd
-import pika
-from botocore.exceptions import BotoCoreError, NoCredentialsError
-from pika.exceptions import AMQPConnectionError
+from app import config_shared
+from app.queue_sender import publish_to_queue
+from app.utils.setup_logger import setup_logger
+from app.utils.types import OutputMode  # Literal["log", "queue", "stdout", "rest", "s3", "database"]
 
-from app import config
-from app.logger import setup_logger
-from app.output_handler import send_to_output
-from app.processor import compute_ichimoku_cloud
-
+# Initialize logger
 logger = setup_logger(__name__)
 
 
-def connect_to_rabbitmq() -> pika.BlockingConnection:
-    """Connects to RabbitMQ using config-based credentials."""
-    retries = 5
-    retry_delay = config.get_polling_interval()
-    while retries > 0:
-        try:
-            credentials = pika.PlainCredentials(
-                config.get_rabbitmq_user(), config.get_rabbitmq_password()
-            )
-            parameters = pika.ConnectionParameters(
-                host=config.get_rabbitmq_host(),
-                port=config.get_rabbitmq_port(),
-                virtual_host=config.get_rabbitmq_vhost(),
-                credentials=credentials,
-                blocked_connection_timeout=30,
-            )
-            connection = pika.BlockingConnection(parameters)
-            if connection.is_open:
-                logger.info("Connected to RabbitMQ")
-                return connection
-        except (AMQPConnectionError, Exception) as e:
-            retries -= 1
-            logger.warning("RabbitMQ connection failed: %s. Retrying in %ss...", e, retry_delay)
-            time.sleep(retry_delay)
-    raise ConnectionError("RabbitMQ connection failed after retries")
+def send_to_output(data: dict[str, Any]) -> None:
+    """Outputs processed analysis results to the configured output system.
 
+    This includes logging the result, printing to console, and
+    sending to RabbitMQ or SQS, unless OUTPUT_MODE is 'log'.
 
-def consume_rabbitmq() -> None:
-    """Consumes messages from RabbitMQ."""
-    connection = connect_to_rabbitmq()
-    channel = connection.channel()
+    Args:
+        data (dict[str, Any]): The processed analysis result to be output.
 
-    channel.exchange_declare(
-        exchange=config.get_rabbitmq_exchange(), exchange_type="topic", durable=True
-    )
-    channel.queue_declare(queue=config.get_rabbitmq_queue(), durable=True)
-    channel.queue_bind(
-        exchange=config.get_rabbitmq_exchange(),
-        queue=config.get_rabbitmq_queue(),
-        routing_key=config.get_rabbitmq_routing_key(),
-    )
-
-    def callback(ch, method, properties, body: bytes) -> None:
-        """:param ch: param method:
-        :param properties: param body: bytes:
-        :param method: param body: bytes:
-        :param body: bytes:
-        :param body: type body: bytes :
-        :param body: type body: bytes :
-        :param body: bytes:
-        :param body: bytes:
-        :param body: bytes:
-        :param body: bytes:
-
-        """
-        try:
-            message = json.loads(body)
-            logger.info("📩 Received message: %s", message)
-
-            df = compute_ichimoku_cloud(pd.DataFrame(message["data"]))
-            result = {
-                "symbol": message.get("symbol"),
-                "timestamp": message.get("timestamp"),
-                "source": "IchimokuCloud",
-                "analysis": df.to_dict(orient="records"),
-            }
-
-            send_to_output(result)
-            ch.basic_ack(delivery_tag=method.delivery_tag)
-        except json.JSONDecodeError:
-            logger.error("❌ Invalid JSON: %s", body)
-            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
-        except Exception as e:
-            logger.error("❌ Error processing message: %s", e)
-            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
-
-    channel.basic_consume(queue=config.get_rabbitmq_queue(), on_message_callback=callback)
-    logger.info("📡 Waiting for messages from RabbitMQ...")
+    Raises:
+        Exception: Logs and raises unexpected exceptions during processing.
+    """
     try:
-        channel.start_consuming()
-    except KeyboardInterrupt:
-        logger.info("Gracefully stopping RabbitMQ consumer...")
-        channel.stop_consuming()
-    finally:
-        connection.close()
-        logger.info("RabbitMQ connection closed.")
+        formatted_output: str = json.dumps(data, indent=4)
+        logger.info("Sending data to output:\n%s", formatted_output)
+        print(formatted_output)
 
+        output_mode: OutputMode = cast(OutputMode, config_shared.get_output_mode())
 
-def consume_sqs() -> None:
-    """Consumes messages from Amazon SQS."""
-    queue_url = config.get_sqs_queue_url()
-    region = config.get_sqs_region()
-    polling_interval = config.get_polling_interval()
-    batch_size = config.get_batch_size()
+        if output_mode == "log":
+            logger.info("🔄 OUTPUT_MODE is 'log'; skipping publish to queue.")
+            return
 
-    try:
-        sqs_client = boto3.client("sqs", region_name=region)
-    except (BotoCoreError, NoCredentialsError) as e:
-        logger.error("Failed to initialize SQS client: %s", e)
-        return
+        publish_to_queue([data])
+        logger.info("✅ Output successfully published to queue.")
 
-    logger.info("📡 Polling for SQS messages...")
-
-    while True:
-        try:
-            response = sqs_client.receive_message(
-                QueueUrl=queue_url,
-                MaxNumberOfMessages=batch_size,
-                WaitTimeSeconds=10,
-            )
-
-            for msg in response.get("Messages", []):
-                try:
-                    body = json.loads(msg["Body"])
-                    logger.info("📩 Received SQS message: %s", body)
-
-                    df = compute_ichimoku_cloud(pd.DataFrame(body["data"]))
-                    result = {
-                        "symbol": body.get("symbol"),
-                        "timestamp": body.get("timestamp"),
-                        "source": "IchimokuCloud",
-                        "analysis": df.to_dict(orient="records"),
-                    }
-
-                    send_to_output(result)
-
-                    sqs_client.delete_message(
-                        QueueUrl=queue_url, ReceiptHandle=msg["ReceiptHandle"]
-                    )
-                    logger.info("✅ Deleted SQS message: %s", msg.get("MessageId"))
-                except json.JSONDecodeError:
-                    logger.error("❌ Invalid JSON in SQS message: %s", msg["Body"])
-                except Exception as e:
-                    logger.error("❌ Error processing SQS message: %s", e)
-        except Exception as e:
-            logger.error("SQS polling failed: %s", e)
-            time.sleep(polling_interval)
-
-
-def consume_messages() -> None:
-    """Dispatches to the appropriate queue consumer."""
-    queue_type = config.get_queue_type()
-    if queue_type == "rabbitmq":
-        consume_rabbitmq()
-    elif queue_type == "sqs":
-        consume_sqs()
-    else:
-        logger.error("❌ Invalid QUEUE_TYPE specified: %s", queue_type)
+    except Exception as e:
+        logger.error("❌ Failed to send output: %s", e)
+        raise
