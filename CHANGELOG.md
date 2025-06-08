@@ -9,7 +9,8 @@
 ### Feat
 
 - **sync**: add full sync_if_needed.py script with logging and Makefile support
-- **versioning**: enforce version consistency across pyproject.toml, __init__.py, and changelog
+- **versioning**: enforce version consistency across pyproject.toml,
+  **init**.py, and changelog
 - **poller**: standard todo across all pollers
 
 ### Fix
@@ -65,7 +66,8 @@
 ### Feat
 
 - **sync**: add full sync_if_needed.py script with logging and Makefile support
-- **versioning**: enforce version consistency across pyproject.toml, __init__.py, and changelog
+- **versioning**: enforce version consistency across pyproject.toml,
+  **init**.py, and changelog
 - **poller**: standard todo across all pollers
 
 ### Fix
