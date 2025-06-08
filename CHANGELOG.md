@@ -1,3 +1,9 @@
+## v0.4.1 (2025-06-08)
+
+### Fix
+
+- **types**: resolve all Pyright issues and sync output handler signature
+
 ## v0.4.0 (2025-06-07)
 
 ### Feat
