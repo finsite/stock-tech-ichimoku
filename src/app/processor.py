@@ -92,7 +92,8 @@ def compute_ichimoku_cloud(df: pd.DataFrame) -> pd.DataFrame:
         df["senkou_span_a"] = ((df["tenkan_sen"] + df["kijun_sen"]) / 2).shift(26)
 
         df["senkou_span_b"] = (
-            (df["High"].rolling(window=52).max() + df["Low"].rolling(window=52).min()) / 2
+            (df["High"].rolling(window=52).max() + df["Low"].rolling(window=52).min())
+            / 2
         ).shift(26)
 
         df["chikou_span"] = df["Close"].shift(-26)
